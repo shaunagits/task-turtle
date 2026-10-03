@@ -67,7 +67,7 @@
       <section class="list-section" aria-labelledby="open-h">
         <div class="list-head">
           <h2 id="open-h">Tasks <span id="open-count" class="count"></span></h2>
-          <span id="filter-slot"></span>
+          <div id="tag-bar" class="tag-bar" role="group" aria-label="Filter by project"></div>
         </div>
         <p id="open-empty" class="empty">Nothing on the list. Add a task above.</p>
         <ul id="open-list" class="list"></ul>
@@ -77,6 +77,7 @@
         <h2 id="done-h">Completed <span id="done-count" class="count"></span></h2>
         <p id="done-empty" class="empty">Checked-off tasks will land here.</p>
         <ul id="done-list" class="list list-done"></ul>
+        <button type="button" id="done-more" class="link more" hidden></button>
       </section>
 
       <footer class="foot">

@@ -140,6 +140,17 @@ button.chip:hover { background: var(--butter); }
   color: var(--muted); font-weight: 600;
 }
 .count { font-weight: 500; }
+/* Tag filters: quiet pills beside the heading, butter when active. */
+.tag-bar { display: flex; gap: 2px; flex-wrap: wrap; margin-left: auto; justify-content: flex-end; }
+.pill {
+  border: 0; background: transparent; border-radius: 999px; padding: 2px 9px; min-height: 22px;
+  font-size: 12px; color: var(--muted); display: inline-flex; align-items: center; gap: 5px; white-space: nowrap;
+}
+.pill:hover { background: rgba(33, 141, 174, 0.08); color: var(--ink); }
+.pill[aria-pressed='true'] { background: var(--butter); color: var(--ink); font-weight: 500; }
+.pill .n { font-size: 10px; font-variant-numeric: tabular-nums; opacity: 0.75; }
+.more { align-self: center; font-size: 12px; color: var(--muted); padding: 4px 8px; }
+.more[hidden] { display: none; }
 .filter {
   display: inline-flex; align-items: center; gap: 2px; background: var(--butter);
   border-radius: 999px; padding: 1px 3px 1px 10px; font-size: 12px; font-weight: 500;
@@ -266,6 +277,12 @@ dialog::backdrop { background: rgba(18, 59, 74, 0.25); }
   .meta .stamp { display: none; }
   .row:not(.is-open) .tags .chip:nth-child(n + 2) { display: none; }
   .kbd-hint { display: none; }
+  /* On phones the filters sit under the heading and scroll sideways. */
+  .tag-bar {
+    flex-basis: 100%; margin-left: -4px; flex-wrap: nowrap; justify-content: flex-start;
+    overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch;
+  }
+  .tag-bar::-webkit-scrollbar { display: none; }
 }
 @media (pointer: coarse) {
   .row { padding-top: 8px; padding-bottom: 8px; }
@@ -276,6 +293,7 @@ dialog::backdrop { background: rgba(18, 59, 74, 0.25); }
   .bar textarea, .account input { font-size: 16px; }
   .go { height: 36px; }
   .hint .chip { padding: 4px 11px; }
+  .pill { min-height: 32px; padding: 4px 12px; }
   .kbd-hint { display: none; }
 }
 @media (prefers-reduced-motion: reduce) {

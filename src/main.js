@@ -22,7 +22,8 @@ const els = {
   doneCount: $('#done-count'),
   openEmpty: $('#open-empty'),
   doneEmpty: $('#done-empty'),
-  filterSlot: $('#filter-slot'),
+  tagBar: $('#tag-bar'),
+  doneMore: $('#done-more'),
   account: $('#account'),
   toast: $('#toast'),
   srStatus: $('#sr-status'),
@@ -42,7 +43,9 @@ const ui = {
   signIn: null, // null | 'form' | 'sent' | 'error'
   installPrompt: null,
   lastPct: null,
+  doneLimit: 10,
 };
+const DONE_PAGE = 10;
 
 if (!isMac) document.querySelectorAll('kbd.mod').forEach((k) => (k.textContent = 'Ctrl'));
 
@@ -108,15 +111,16 @@ function render() {
   const open = openTasks(list);
   const done = doneTasks(list);
   els.openList.innerHTML = open.map(rowHTML).join('');
-  els.doneList.innerHTML = done.map(rowHTML).join('');
+  els.doneList.innerHTML = done.slice(0, ui.doneLimit).map(rowHTML).join('');
+  const hiddenDone = done.length - ui.doneLimit;
+  els.doneMore.hidden = hiddenDone <= 0;
+  els.doneMore.textContent = hiddenDone > 0 ? `Show ${Math.min(hiddenDone, DONE_PAGE)} more of ${hiddenDone}` : '';
   els.openCount.textContent = open.length ? `(${open.length})` : '';
   els.doneCount.textContent = done.length ? `(${done.length})` : '';
   els.openEmpty.hidden = open.length > 0;
   els.doneEmpty.hidden = done.length > 0;
   els.openEmpty.textContent = ui.filter ? `No open tasks in @${ui.filter}.` : 'Nothing on the list. Add a task above.';
-  els.filterSlot.innerHTML = ui.filter
-    ? `<span class="filter">@${esc(ui.filter)}<button type="button" data-act="clear-filter" aria-label="Show all projects">${X_ICON}</button></span>`
-    : '';
+  renderTagBar();
 
   if (focusKey) {
     const row = document.querySelector(`.row[data-id="${focusKey[0]}"]`);
@@ -125,6 +129,26 @@ function render() {
   }
   ui.justAdded = null;
   renderTrail();
+}
+
+function renderTagBar() {
+  const tags = allTags();
+  // A filter whose last task is gone quietly resets.
+  if (ui.filter && !tags.some(([g]) => g === ui.filter)) ui.filter = null;
+  if (!tags.length) {
+    els.tagBar.innerHTML = '';
+    return;
+  }
+  const openBy = new Map();
+  live().forEach((t) => !t.done && t.tags.forEach((g) => openBy.set(g, (openBy.get(g) || 0) + 1)));
+  const pill = (tag, label, n) =>
+    `<button type="button" class="pill" data-filter="${esc(tag)}" aria-pressed="${ui.filter === (tag || null)}">${label}${
+      n ? `<span class="n">${n}</span>` : ''
+    }</button>`;
+  const ordered = tags
+    .map(([g]) => g)
+    .sort((a, b) => (openBy.get(b) || 0) - (openBy.get(a) || 0) || a.localeCompare(b));
+  els.tagBar.innerHTML = pill('', 'All') + ordered.map((g) => pill(g, `@${esc(g)}`, openBy.get(g) || 0)).join('');
 }
 
 function renderTrail() {
@@ -252,6 +276,7 @@ function undoDelete() {
 
 function setFilter(tag) {
   ui.filter = tag;
+  ui.doneLimit = DONE_PAGE;
   ui.expanded = null;
   render();
   announce(tag ? `Showing @${tag}` : 'Showing all tasks');
@@ -331,7 +356,12 @@ document.addEventListener('click', (e) => {
       return render();
     }
   }
-  if (act === 'clear-filter') return setFilter(null);
+  const pill = e.target.closest('[data-filter]');
+  if (pill) return setFilter(pill.dataset.filter && pill.dataset.filter !== ui.filter ? pill.dataset.filter : null);
+  if (e.target === els.doneMore) {
+    ui.doneLimit += DONE_PAGE;
+    return render();
+  }
   if (act === 'sign-in') return ((ui.signIn = 'form'), renderAccount());
   if (act === 'cancel-sign-in') return ((ui.signIn = null), renderAccount());
   if (act === 'sign-out') return sync.signOut();
