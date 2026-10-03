@@ -1,0 +1,20 @@
+{
+  "name": "task-turtle",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "A calm, fast task list. Slow and steady gets it done.",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "node --test tests/*.test.js"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.117.2"
+  },
+  "devDependencies": {
+    "vite": "^8.3.2",
+    "vite-plugin-pwa": "^1.3.0"
+  }
+}

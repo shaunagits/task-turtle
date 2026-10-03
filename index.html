@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Task Turtle</title>
+    <meta name="description" content="A calm, fast task list. Type it, tag it with @, check it off. Slow and steady gets it done." />
+    <meta name="theme-color" content="#FFFFFF" />
+    <meta property="og:title" content="Task Turtle" />
+    <meta property="og:description" content="A calm, fast task list. Slow and steady gets it done." />
+    <meta property="og:image" content="/og.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Parkinsans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  </head>
+  <body>
+    <main class="wrap">
+      <header class="masthead">
+        <svg class="logo" width="72" height="40" viewBox="-8 0 72 40" fill="none" aria-hidden="true">
+          <g stroke="#218DAE" stroke-width="2" stroke-linecap="round" opacity="0.4"><path d="M-6 14h7" /><path d="M-4 19h6" /><path d="M-6 24h7" /></g>
+          <path d="M10 27L4 29.5h7z" fill="#218DAE" />
+          <path d="M44 28l2-6q2-5 7-5q6 0 6 5q0 5-6 5l-3 1z" fill="#218DAE" />
+          <circle cx="55" cy="21" r="1.3" fill="#FFFFFF" />
+          <rect x="13" y="27" width="7" height="8" rx="2.5" fill="#218DAE" />
+          <rect x="37" y="27" width="7" height="8" rx="2.5" fill="#218DAE" />
+          <path d="M10 28C10 15 19 7 28 7s18 8 18 21z" fill="#218DAE" />
+          <g stroke="#FFFFFF" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"><path d="M24 13h8l3 6-3 6h-8l-3-6z" /><path d="M24 13l-4-4.5M32 13l4-4.5M21 19h-9M35 19h9M24 25l-2 3M32 25l2 3" /></g>
+          <rect x="8" y="27" width="40" height="3" rx="1.5" fill="#218DAE" />
+        </svg>
+        <h1>Task Turtle</h1>
+        <p class="tagline">Slow and steady gets it done.</p>
+        <time id="now" class="now"></time>
+      </header>
+
+      <div class="trail-wrap">
+        <div id="trail" class="trail" role="progressbar" aria-label="Today's progress" aria-valuemin="0">
+          <div class="trail-track"><div class="trail-fill"></div></div>
+          <span class="trail-finish" aria-hidden="true"></span>
+          <span class="trail-turtle" aria-hidden="true">
+            <svg width="30" height="17" viewBox="2 5 58 32" fill="none">
+              <path d="M10 27L4 29.5h7z" fill="#218DAE" />
+              <path d="M44 28l2-6q2-5 7-5q6 0 6 5q0 5-6 5l-3 1z" fill="#218DAE" />
+              <circle cx="55" cy="21" r="1.6" fill="#FFFFFF" />
+              <rect class="leg leg-back" x="13" y="27" width="7" height="8" rx="2.5" fill="#218DAE" />
+              <rect class="leg leg-front" x="37" y="27" width="7" height="8" rx="2.5" fill="#218DAE" />
+              <path d="M10 28C10 15 19 7 28 7s18 8 18 21z" fill="#218DAE" />
+              <path d="M24 13h8l3 6-3 6h-8l-3-6z" stroke="#FFFFFF" stroke-width="2" stroke-linejoin="round" />
+              <rect x="8" y="27" width="40" height="3" rx="1.5" fill="#218DAE" />
+            </svg>
+          </span>
+        </div>
+        <p id="trail-label" class="trail-label"></p>
+      </div>
+
+      <section class="composer" aria-label="Add a task">
+        <form id="task-form" class="bar" autocomplete="off">
+          <label for="task-input" class="sr">New task. Type @ and a name to tag a project.</label>
+          <textarea id="task-input" rows="1" maxlength="240" placeholder="Task (type @ to tag a project)" enterkeyhint="done"></textarea>
+          <button type="submit" class="go">Submit</button>
+        </form>
+        <div id="hint" class="hint"></div>
+      </section>
+
+      <section class="list-section" aria-labelledby="open-h">
+        <div class="list-head">
+          <h2 id="open-h">Tasks <span id="open-count" class="count"></span></h2>
+          <span id="filter-slot"></span>
+        </div>
+        <p id="open-empty" class="empty">Nothing on the list. Add a task above.</p>
+        <ul id="open-list" class="list"></ul>
+      </section>
+
+      <section class="list-section done-section" aria-labelledby="done-h">
+        <h2 id="done-h">Completed <span id="done-count" class="count"></span></h2>
+        <p id="done-empty" class="empty">Checked-off tasks will land here.</p>
+        <ul id="done-list" class="list list-done"></ul>
+      </section>
+
+      <footer class="foot">
+        <div id="account" class="account"></div>
+        <p class="kbd-hint">Press <kbd>?</kbd> for shortcuts · <kbd class="mod">⌘</kbd><kbd>K</kbd> for commands</p>
+      </footer>
+    </main>
+
+    <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+    <div id="sr-status" class="sr" role="status" aria-live="polite"></div>
+
+    <dialog id="palette" class="palette" aria-label="Command menu">
+      <input id="palette-input" type="text" placeholder="Type a command or @project" aria-label="Search commands" autocomplete="off" role="combobox" aria-controls="palette-list" aria-expanded="true" />
+      <ul id="palette-list" role="listbox" aria-label="Commands"></ul>
+    </dialog>
+
+    <dialog id="help" class="help" aria-labelledby="help-h">
+      <h2 id="help-h">Keyboard shortcuts</h2>
+      <dl>
+        <div><dt><kbd>/</kbd> or <kbd>n</kbd></dt><dd>New task</dd></div>
+        <div><dt><kbd class="mod">⌘</kbd><kbd>K</kbd></dt><dd>Command menu</dd></div>
+        <div><dt><kbd>j</kbd> <kbd>k</kbd></dt><dd>Move down and up the list</dd></div>
+        <div><dt><kbd>x</kbd></dt><dd>Check off or uncheck</dd></div>
+        <div><dt><kbd>Enter</kbd></dt><dd>Expand or collapse</dd></div>
+        <div><dt><kbd>f</kbd></dt><dd>Filter by the task's first @tag</dd></div>
+        <div><dt><kbd>Backspace</kbd></dt><dd>Delete (with undo)</dd></div>
+        <div><dt><kbd>u</kbd></dt><dd>Undo delete</dd></div>
+        <div><dt><kbd>Esc</kbd></dt><dd>Clear selection, filter or input</dd></div>
+      </dl>
+      <h2>Typing tricks</h2>
+      <dl>
+        <div><dt><code>@project</code></dt><dd>Tag it (add as many as you like)</dd></div>
+        <div><dt><code>fri</code> <code>tomorrow</code> <code>10/15</code></dt><dd>Due date</dd></div>
+        <div><dt><code>3pm</code> <code>9:30am</code> <code>noon</code></dt><dd>Due time</dd></div>
+        <div><dt><code>!</code></dt><dd>Priority, pinned to the top</dd></div>
+        <div><dt><kbd>Shift</kbd><kbd>Enter</kbd></dt><dd>New line (up to 3)</dd></div>
+      </dl>
+      <form method="dialog"><button class="go">Got it</button></form>
+    </dialog>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
